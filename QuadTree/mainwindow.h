@@ -19,6 +19,10 @@ public:
 private slots:
     void on_b_fileOpen_clicked();
 
+    void on_b_procesarImagen_clicked();
+
+    void on_b_exportarImagen_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
