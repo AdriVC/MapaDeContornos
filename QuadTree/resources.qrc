@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>open_file.png</file>
+        <file>background.jpg</file>
+        <file>flecha.png</file>
+    </qresource>
+</RCC>
