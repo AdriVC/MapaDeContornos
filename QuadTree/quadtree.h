@@ -6,17 +6,16 @@
 
 class QuadTree{
     Nodo* root;
+    int profundidad;
 public:
-    QuadTree(int dato);
+    QuadTree(int left, int top, int length, int height, int profundidad);
     ~QuadTree();
-    Nodo* getParent(Nodo* n);
-    Nodo* getLeftSon(Nodo* n);
-    Nodo* getRightSon(Nodo* n);
-    int getValue(Nodo* n);
+    Nodo* getParent(Nodo* nodo);
+    Nodo* getSon(Nodo* nodo, int pos);
+    int* getParams(Nodo* nodo);
+    int getParam(Nodo* nodo, int pos);
     Nodo* getRoot();
-    void insert(int valor);
-    void Delete(Nodo* n);
-    void inOrder();
+    void insert(int left, int top, int length, int height, Nodo* parent, int pos);
 };
 
 #endif // QUADTREE_H

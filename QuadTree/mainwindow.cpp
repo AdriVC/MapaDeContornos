@@ -95,6 +95,7 @@ void MainWindow::on_b_procesarImagen_clicked()
         ui->b_exportarImagen->setEnabled(true);
         ui->LE_outputPath->setText(fileName.split("/")[9].split(".")[0].append("Output.bmp"));
         lecturaImagen();
+        //procesarImagen();
         //para agregar la imagen procesada al label de output
         //QImage Raw(fileName);
         //ui->L_output->setPixmap(QPixmap::fromImage(Raw));
@@ -160,13 +161,6 @@ void MainWindow::lecturaImagen()
             }
         }
     }
-    /*cout << "Reds: " << endl;
-    printMatrizRGB(redsIm);
-    cout << "Greens: " << endl;
-    printMatrizRGB(greensIm);
-    cout << "Blues: " << endl;
-    printMatrizRGB(bluesIm);*/
-
 
 }
 

@@ -3,18 +3,23 @@
 
 
 class Nodo{
-       int dato;
-       Nodo** sons;
-       Nodo* parent;
+    //parametros: [left,top,length,height]
+    int* parametros;
+    int posicion;
+    Nodo** sons;
+    Nodo* parent;
 public:
-    Nodo(int value, Nodo* &father);
+    Nodo(int left, int top, int length, int height, Nodo* father, int pos);
     ~Nodo();
-    void setDato(int value);
-    int getDato();
-    void setSon(Nodo* &son,int pos);
+    void setParam(int dato,int pos);
+    int getParam(int pos);
+    int* getParams();
+    void setSon(Nodo* son,int pos);
     Nodo* getSon(int pos);
-    void setParent(Nodo* &par);
+    void setParent(Nodo* par);
     Nodo* getParent();
+    void setPosicion(int pos);
+    int getPosicion();
 };
 
 #endif // NODO_H
