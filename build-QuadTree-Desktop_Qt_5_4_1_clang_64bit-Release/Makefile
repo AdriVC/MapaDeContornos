@@ -49,10 +49,14 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../QuadTree/main.cpp \
-		../QuadTree/mainwindow.cpp qrc_resources.cpp \
+		../QuadTree/mainwindow.cpp \
+		../QuadTree/nodo.cpp \
+		../QuadTree/quadtree.cpp qrc_resources.cpp \
 		moc_mainwindow.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
+		nodo.o \
+		quadtree.o \
 		qrc_resources.o \
 		moc_mainwindow.o
 DIST          = /Applications/Qt/5.4/clang_64/mkspecs/features/spec_pre.prf \
@@ -183,8 +187,12 @@ DIST          = /Applications/Qt/5.4/clang_64/mkspecs/features/spec_pre.prf \
 		/Applications/Qt/5.4/clang_64/mkspecs/features/exceptions.prf \
 		/Applications/Qt/5.4/clang_64/mkspecs/features/yacc.prf \
 		/Applications/Qt/5.4/clang_64/mkspecs/features/lex.prf \
-		../QuadTree/QuadTree.pro ../QuadTree/mainwindow.h ../QuadTree/main.cpp \
-		../QuadTree/mainwindow.cpp
+		../QuadTree/QuadTree.pro ../QuadTree/mainwindow.h \
+		../QuadTree/nodo.h \
+		../QuadTree/quadtree.h ../QuadTree/main.cpp \
+		../QuadTree/mainwindow.cpp \
+		../QuadTree/nodo.cpp \
+		../QuadTree/quadtree.cpp
 QMAKE_TARGET  = QuadTree
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = QuadTree.app/Contents/MacOS/QuadTree
@@ -523,8 +531,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../QuadTree/resources.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents ../QuadTree/mainwindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../QuadTree/main.cpp ../QuadTree/mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../QuadTree/mainwindow.h ../QuadTree/nodo.h ../QuadTree/quadtree.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../QuadTree/main.cpp ../QuadTree/mainwindow.cpp ../QuadTree/nodo.cpp ../QuadTree/quadtree.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../QuadTree/mainwindow.ui $(DISTDIR)/
 
 
@@ -598,8 +606,19 @@ mainwindow.o: ../QuadTree/mainwindow.cpp ../QuadTree/mainwindow.h \
 		/Applications/Qt/5.4/clang_64/lib/QtWidgets.framework/Versions/5/Headers/qmainwindow.h \
 		ui_mainwindow.h \
 		/Applications/Qt/5.4/clang_64/lib/QtWidgets.framework/Versions/5/Headers/QFileDialog \
-		/Applications/Qt/5.4/clang_64/lib/QtWidgets.framework/Versions/5/Headers/qfiledialog.h
+		/Applications/Qt/5.4/clang_64/lib/QtWidgets.framework/Versions/5/Headers/qfiledialog.h \
+		/Applications/Qt/5.4/clang_64/lib/QtWidgets.framework/Versions/5/Headers/QMessageBox \
+		/Applications/Qt/5.4/clang_64/lib/QtWidgets.framework/Versions/5/Headers/qmessagebox.h \
+		/Applications/Qt/5.4/clang_64/lib/QtGui.framework/Versions/5/Headers/QImage \
+		/Applications/Qt/5.4/clang_64/lib/QtGui.framework/Versions/5/Headers/qimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../QuadTree/mainwindow.cpp
+
+nodo.o: ../QuadTree/nodo.cpp ../QuadTree/nodo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o nodo.o ../QuadTree/nodo.cpp
+
+quadtree.o: ../QuadTree/quadtree.cpp ../QuadTree/quadtree.h \
+		../QuadTree/nodo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quadtree.o ../QuadTree/quadtree.cpp
 
 qrc_resources.o: qrc_resources.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_resources.o qrc_resources.cpp

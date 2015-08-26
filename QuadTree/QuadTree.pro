@@ -13,9 +13,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    nodo.cpp \
+    quadtree.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    nodo.h \
+    quadtree.h
 
 FORMS    += mainwindow.ui
 

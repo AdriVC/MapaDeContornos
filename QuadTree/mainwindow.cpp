@@ -3,6 +3,41 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QImage>
+#include <iostream>
+#include <unistd.h>
+#include <fstream>
+
+using std::ifstream;
+using std::ofstream;
+using std::cout;
+using std::endl;
+#pragma pack(1)
+
+typedef int LONG;
+typedef unsigned short WORD;
+typedef unsigned int DWORD;
+
+typedef struct tagBITMAPFILEHEADER {
+    WORD bfType;
+    DWORD bfSize;
+    WORD bfReserved1;
+    WORD bfReserved2;
+    DWORD bfOffBits;
+} BITMAPFILEHEADER, *PBITMAPFILEHEADER;
+
+typedef struct tagBITMAPINFOHEADER {
+    DWORD biSize;
+    LONG biWidth;
+    LONG biHeight;
+    WORD biPlanes;
+    WORD biBitCount;
+    DWORD biCompression;
+    DWORD biSizeImage;
+    LONG biXPelsPerMeter;
+    LONG biYPelsPerMeter;
+    DWORD biClrUsed;
+    DWORD biClrImportant;
+} BITMAPINFOHEADER, *PBITMAPINFOHEADER;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -59,6 +94,7 @@ void MainWindow::on_b_procesarImagen_clicked()
         ui->L_output->setText("");
         ui->b_exportarImagen->setEnabled(true);
         ui->LE_outputPath->setText(fileName.split("/")[9].split(".")[0].append("Output.bmp"));
+        lecturaImagen();
         //para agregar la imagen procesada al label de output
         //QImage Raw(fileName);
         //ui->L_output->setPixmap(QPixmap::fromImage(Raw));
@@ -68,6 +104,91 @@ void MainWindow::on_b_procesarImagen_clicked()
 }
 
 void MainWindow::on_b_exportarImagen_clicked()
+{
+
+}
+
+void MainWindow::lecturaImagen()
+{
+    char* buffer;
+    int BufferSize;
+
+    std::ifstream file(fileName.toUtf8().constData());
+    file.seekg(0, std::ios::end);
+    std::streampos length = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    buffer = new char[length];
+    file.read(&buffer[0], length);
+
+    PBITMAPFILEHEADER file_header;
+    PBITMAPINFOHEADER info_header;
+
+    file_header = (PBITMAPFILEHEADER) (&buffer[0]);
+    info_header = (PBITMAPINFOHEADER) (&buffer[0] + sizeof(BITMAPFILEHEADER));
+    rows = info_header->biHeight;
+    cols = info_header->biWidth;
+    BufferSize = file_header->bfSize;
+
+    crearMatrizRGB(redsIm);
+    crearMatrizRGB(greensIm);
+    crearMatrizRGB(bluesIm);
+
+    //cout << "buffer: " << buffer << endl;
+    //cout << "length: " << length << endl;
+    //cout << "buffer size: " << BufferSize << endl;
+    cout << "rows: " << rows << endl;
+    cout << "columns: " << cols << endl;
+
+    int count = 1;
+    int extra = cols % 4; // The nubmer of bytes in a row (cols) will be a multiple of 4.
+    for (int i = 0; i < rows; i++){
+        count += extra;
+        for (int j = cols - 1; j >= 0; j--){
+            for (int k = 0; k < 3; k++) {
+                switch (k) {
+                case 0:
+                    redsIm[i][j] = buffer[BufferSize - count++];
+                    break;
+                case 1:
+                    greensIm[i][j] = buffer[BufferSize - count++];
+                    break;
+                case 2:
+                    bluesIm[i][j] = buffer[BufferSize - count++];
+                    break;
+                }
+            }
+        }
+    }
+    /*cout << "Reds: " << endl;
+    printMatrizRGB(redsIm);
+    cout << "Greens: " << endl;
+    printMatrizRGB(greensIm);
+    cout << "Blues: " << endl;
+    printMatrizRGB(bluesIm);*/
+
+
+}
+
+void MainWindow::crearMatrizRGB(unsigned char** &matriz)
+{
+    matriz = new unsigned char*[rows];
+    for(int i = 0; i < rows; i++){
+        matriz[i] = new unsigned char[cols];
+    }
+}
+
+void MainWindow::printMatrizRGB(unsigned char** &matriz)
+{
+    for(int i = 0; i < rows; i++){
+        for(int j = 0; j < cols; j++){
+            cout << matriz[i][j] << "\t";
+        }
+        cout << endl;
+    }
+}
+
+void MainWindow::procesarImagen()
 {
 
 }

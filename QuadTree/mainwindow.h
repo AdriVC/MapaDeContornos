@@ -14,7 +14,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    QString fileName;
+
 
 private slots:
     void on_b_fileOpen_clicked();
@@ -23,8 +23,25 @@ private slots:
 
     void on_b_exportarImagen_clicked();
 
+    void procesarImagen();
+
+    void lecturaImagen();
+
+    void crearMatrizRGB(unsigned char** &matriz);
+
+    void printMatrizRGB(unsigned char** &matriz);
+
 private:
     Ui::MainWindow *ui;
+    unsigned char** redsIm;
+    unsigned char** greensIm;
+    unsigned char** bluesIm;
+    unsigned char** redsRe;
+    unsigned char** greensRe;
+    unsigned char** bluesRe;
+    int rows;
+    int cols;
+    QString fileName;
 };
 
 #endif // MAINWINDOW_H
