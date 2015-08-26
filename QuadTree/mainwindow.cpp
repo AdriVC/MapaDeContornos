@@ -16,6 +16,7 @@ using std::endl;
 typedef int LONG;
 typedef unsigned short WORD;
 typedef unsigned int DWORD;
+int controlador;
 
 typedef struct tagBITMAPFILEHEADER {
     WORD bfType;
@@ -106,6 +107,48 @@ void MainWindow::on_b_procesarImagen_clicked()
 
 void MainWindow::on_b_exportarImagen_clicked()
 {
+    char* FileBuffer;
+    int BufferSize;
+
+    FileBuffer = new char[controlador];
+
+    std::ofstream write(fileName.split("/")[9].split(".")[0].append("Output.bmp").toUtf8().constData());
+
+    if (!write) {
+        cout << "Failed to write " << endl;
+        return;
+    }
+    //BufferSize = BufferSizeControlador;
+    BufferSize=349338;
+    int count = 1;
+    int extra = cols % 4; // The nubmer of bytes in a row (cols) will be a multiple of 4.
+    for (int i = 0; i < rows; i++){
+        count += extra;
+        //count += 900;
+        cout<<BufferSize<<endl;
+        cout<<cols<<endl;
+        cout<<rows<<endl;
+        cout<<count<<endl;
+        cout<<extra<<endl;
+        for (int j = cols - 1; j >= 0; j--)
+            for (int k = 0; k < 3; k++) {
+                switch (k) {
+                case 0: //reds
+                    FileBuffer[BufferSize - count] = redsIm[i][j];
+                    break;
+                case 1: //green
+                    FileBuffer[BufferSize - count] = greensIm[i][j];
+                    break;
+                case 2: //blue
+                    FileBuffer[BufferSize - count] = bluesIm[i][j];
+                    break;
+                }
+                count++;
+
+            }
+    }
+
+    write.write(FileBuffer, BufferSize);
 
 }
 
