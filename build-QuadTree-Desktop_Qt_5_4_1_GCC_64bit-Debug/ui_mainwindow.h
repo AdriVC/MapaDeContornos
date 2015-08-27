@@ -42,6 +42,7 @@ public:
     QPushButton *b_procesarImagen;
     QPushButton *b_exportarImagen;
     QLabel *label;
+    QPushButton *all;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -139,10 +140,13 @@ public:
         font4.setFamily(QStringLiteral("StarJedi Special Edition"));
         font4.setPointSize(12);
         label->setFont(font4);
+        all = new QPushButton(centralWidget);
+        all->setObjectName(QStringLiteral("all"));
+        all->setGeometry(QRect(330, 400, 99, 27));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 720, 22));
+        menuBar->setGeometry(QRect(0, 0, 720, 25));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -168,6 +172,7 @@ public:
         b_procesarImagen->setText(QApplication::translate("MainWindow", "PRoCESAR", 0));
         b_exportarImagen->setText(QApplication::translate("MainWindow", "Exportar", 0));
         label->setText(QApplication::translate("MainWindow", "Por: Adriana vega y Fernando Reyes", 0));
+        all->setText(QApplication::translate("MainWindow", "PushButton", 0));
     } // retranslateUi
 
 };
