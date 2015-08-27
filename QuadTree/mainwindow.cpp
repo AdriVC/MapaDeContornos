@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "nodo.h"
+#include "quadtree.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QImage>
@@ -65,7 +67,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->LE_outputPath->setText("");
     ui->L_output->setText("Favor seleccione la \nprofundidad y haga \nclick en \"Procesar\"");
     ui->L_image->setText("Favor seleccione la \nimagen a procesar");
-    ui->b_exportarImagen->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -84,14 +85,14 @@ void MainWindow::on_b_fileOpen_clicked()
     ui->L_image->setPixmap(QPixmap::fromImage(Raw));
     //#define Picture "ReadInPicture2.bmp"
 
-    //if (!FillAndAllocate(FileBuffer, fileName.toUtf8().constData(), rows, cols, BufferSize)){cout << "File read error" << endl; cout<<"Return 0";}
-    if (!FillAndAllocate(FileBuffer, fileName.toUtf8().constData(), rows, cols, BufferSize)){cout << "File read error" << endl; cout<<"Return 0";}
+    //if (!InfoDeImagen(FileBuffer, fileName.toUtf8().constData(), rows, cols, BufferSize)){cout << "File read error" << endl; cout<<"Return 0";}
+    /*if (!InfoDeImagen(FileBuffer, fileName.toUtf8().constData(), rows, cols, BufferSize)){cout << "File read error" << endl; cout<<"Return 0";}
 
     cout << "Rows: " << rows << " Cols: " << cols << endl;
-    RGB_Allocate(reds);
-    RGB_Allocate(greens);
-    RGB_Allocate(blues);
-    GetPixlesFromBMP24( reds,  greens, blues,BufferSize, rows, cols, FileBuffer);
+    crearMatrizRGB(redsIm);
+    crearMatrizRGB(greensIm);
+    crearMatrizRGB(bluesIm);
+    LecturaDeImagen( redsIm,  greensIm, bluesIm, redsRe,  greensRe, bluesRe,BufferSize, rows, cols, FileBuffer);*/
 
 }
 
@@ -104,29 +105,44 @@ void MainWindow::on_b_procesarImagen_clicked()
         msgbox.setText("Favor asegurese que haya \nseleccionado la imagen a procesar \ny la profundidad deseada.");
         msgbox.exec();
     }else{
-        //ui->sB_profundidad->setValue(-1);
         ui->L_output->setText("");
-        ui->b_exportarImagen->setEnabled(true);
         ui->LE_outputPath->setText(fileName.split("/")[9].split(".")[0].append("Output.bmp"));
-        //lecturaImagen();
-        //procesarImagen();
-        //para agregar la imagen procesada al label de output
-        //QImage Raw(fileName);
-        //ui->L_output->setPixmap(QPixmap::fromImage(Raw));
+
+        char* FileBuffer; int BufferSize;
+
+        if (!InfoDeImagen(FileBuffer, fileName.toUtf8().constData(), rows, cols, BufferSize)){}
+
+        crearMatrizRGB(redsIm);
+        crearMatrizRGB(greensIm);
+        crearMatrizRGB(bluesIm);
+        crearMatrizRGB(redsRe);
+        crearMatrizRGB(greensRe);
+        crearMatrizRGB(bluesRe);
+        LecturaDeImagen( redsIm,  greensIm, bluesIm, redsRe,  greensRe, bluesRe,BufferSize, rows, cols, FileBuffer);
+
+        QuadTree* arbol = new QuadTree(0,0,cols,rows,-1);
+        Nodo* temp = arbol->getRoot();
+
+        procesarImagen(temp,0, redsIm, greensIm, bluesIm, redsRe, greensRe, bluesRe);
+
+#define WriteOutFile "Output.bmp"
+        EscrituraDeImagen(FileBuffer,  WriteOutFile,BufferSize);
+
+        QMessageBox msgbox;
+        msgbox.setBaseSize(QSize(310, 150));
+        msgbox.setWindowTitle("Info");
+        msgbox.setText("Su imagen Output.bmp se ha colocado en el folder de imagenes.");
+        msgbox.exec();
+
+        ui->L_image->setText("");
+        QImage Raw("Output.bmp");
+        ui->L_output->setPixmap(QPixmap::fromImage(Raw));
 
     }
 
 }
 
-void MainWindow::on_b_exportarImagen_clicked()
-{
-#define WriteOutFile "Extracted.bmp"
-WriteOutBmp24(FileBuffer,  WriteOutFile,BufferSize);
-cout<<BufferSize<<endl;
-
-}
-
-void MainWindow::crearMatrizRGB(unsigned char** &matriz)
+void MainWindow::crearMatrizRGB(unsigned char**& matriz)
 {
     matriz = new unsigned char*[rows];
     for(int i = 0; i < rows; i++){
@@ -134,83 +150,43 @@ void MainWindow::crearMatrizRGB(unsigned char** &matriz)
     }
 }
 
-void MainWindow::printMatrizRGB(unsigned char** &matriz)
+void MainWindow::procesarImagen(Nodo* nodo,int depth,unsigned char** redsIm, unsigned char** greensIm, unsigned char** bluesIm, unsigned char** redsRe, unsigned char** greensRe, unsigned char** bluesRe)
 {
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < cols; j++){
-            cout << matriz[i][j] << "\t";
+    if(compararPixeles(nodo,redsIm, greensIm, bluesIm) && depth < ui->sB_profundidad->value()){
+        nodo->insert();
+        for(int i= nodo->getParam(0); i < nodo->getParam(2); i++){
+            redsRe[nodo->getParam(1)+nodo->getParam(3)/2][i] = 0x00;
+            greensRe[nodo->getParam(1)+nodo->getParam(3)/2][i] = 0x00;
+            bluesRe[nodo->getParam(1)+nodo->getParam(3)/2][i] = 0x00;
         }
-        cout << endl;
+        for(int i= nodo->getParam(1); i < nodo->getParam(3); i++){
+            redsRe[nodo->getParam(0)+nodo->getParam(2)/2][i] = 0x00;
+            greensRe[nodo->getParam(0)+nodo->getParam(2)/2][i] = 0x00;
+            bluesRe[nodo->getParam(0)+nodo->getParam(2)/2][i] = 0x00;
+        }
+        for(int i=0; i < 4; i++){
+            procesarImagen(nodo->getSon(0),depth++,redsIm, greensIm, bluesIm, redsRe, greensRe, bluesRe);
+        }
     }
 }
 
-void MainWindow::procesarImagen()
+bool MainWindow::compararPixeles(Nodo* nodo, unsigned char** redsIm, unsigned char** greensIm, unsigned char** bluesIm)
 {
-    char* FileBuffer; int BufferSize;
-
-    //#define Picture "Ness.bmp"
-    //if (!FillAndAllocate(FileBuffer, Picture, rows, cols, BufferSize)){}
-    if (!FillAndAllocate(FileBuffer, fileName.toUtf8().constData(), rows, cols, BufferSize)){}
-
-    RGB_Allocate(reds);
-    RGB_Allocate(greens);
-    RGB_Allocate(blues);
-    GetPixlesFromBMP24( reds,  greens, blues,BufferSize, rows, cols, FileBuffer);
-    QString outFileName = QFileDialog::getSaveFileName(this,tr("Save Image"), "/Users/adrivega/Documents/UNITEC/2015-3 jul - sept/Estructura de Datos/P2-QuadTree/Imagenes", tr("Image Files (*.bmp)"));
-    #define WriteOutFile outFileName.toUtf8().constData()
-
-    WriteOutBmp24(FileBuffer,  WriteOutFile,BufferSize);
-    ui->L_image->setText("");
-    QImage Raw(outFileName.toUtf8().constData());
-    ui->L_output->setPixmap(QPixmap::fromImage(Raw));
-}
-
-/*void MainWindow::ColorTest() {
-//     Makes Red Rectangle in top left corner. Rectangle stretches to right alot
-    for (int i = rows / 10; i < 3 * rows / 10; i++)
-        for (int j = cols / 10; j < 7 * cols / 10; j++)
-            reds[i][j] = 0xFF;
-
-// Makes small green box in bottom right
-    for (int i = 8 * rows / 10; i < rows; i++)
-        for (int j = 8 * cols / 10; j < cols; j++){
-            greens[i][j] = 0x00;
-            reds[i][j] = 0x00;
+    bool nosolido = false;
+    for(int i = nodo->getParam(1); i < nodo->getParam(3); i++){
+        for(int j = nodo->getParam(0); j < nodo->getParam(2)-1; j++){
+            if(redsIm[i][j] != redsIm[i][j+1] || greensIm[i][j] != greensIm[i][j+1] || bluesIm[i][j] != bluesIm[i][j+1])
+                nosolido = true;
+                break;
         }
+        if(nosolido)
+            break;
 
-// Makes White box in the middle of the screeene
-    for (int i = rows * 4 / 10; i < rows * 6 / 10; i++)
-        for (int j = cols * 4 / 10; j < cols * 6 / 10; j++) {
-            greens[i][j] = 0xFF;
-            reds[i][j] = 0x00;
-            blues[i][j] = 0xFF;
-        }
-
-// Blue verticle rectangle bottom left
-    for (int i = rows * 6 / 10; i < rows; i++)
-        for (int j = cols * 0; j < cols * 1 / 10; j++)
-            blues[i][j] = 0xFF;
-
-    for (int i = 0; i < rows; ++i){
-        reds[i][cols/2] = 0xFF;
-        greens[i][cols/2] = 0x00;
-        blues[i][cols/2] = 0xFF;
     }
-    for (int i = 0; i < cols; ++i){
-        reds[rows/2][i] = 0xFF;
-        greens[rows/2][i] = 0x00;
-        blues[rows/2][i] = 0xFF;
-    }
-}
-*/
-
-void MainWindow::RGB_Allocate(unsigned char**& dude) {
-    dude = new unsigned char*[rows];
-    for (int i = 0; i < rows; i++)
-        dude[i] = new unsigned char[cols];
+    return nosolido;
 }
 
-bool MainWindow::FillAndAllocate(char*& buffer, const char* Picture, int& rows, int& cols, int& BufferSize) { //Returns 1 if executed sucessfully, 0 if not sucessfull
+bool MainWindow::InfoDeImagen(char*& buffer, const char* Picture, int& rows, int& cols, int& BufferSize) { //Returns 1 if executed sucessfully, 0 if not sucessfull
     std::ifstream file(Picture);
 
     if (file) {
@@ -238,29 +214,32 @@ bool MainWindow::FillAndAllocate(char*& buffer, const char* Picture, int& rows, 
 }
 
 
-void MainWindow::GetPixlesFromBMP24(unsigned char** reds, unsigned char** greens, unsigned char** blues, int end, int rows, int cols, char* FileReadBuffer) { // end is BufferSize (total size of file)
+void MainWindow::LecturaDeImagen(unsigned char** redsIm, unsigned char** greensIm, unsigned char** bluesIm, unsigned char** redsRe, unsigned char** greensRe, unsigned char** bluesRe, int end, int rows, int cols, char* FileReadBuffer) { // end is BufferSize (total size of file)
     int count = 1;
-int extra = cols % 4; // The nubmer of bytes in a row (cols) will be a multiple of 4.
+    int extra = cols % 4; // The nubmer of bytes in a row (cols) will be a multiple of 4.
     for (int i = 0; i < rows; i++){
-count += extra;
-    for (int j = cols - 1; j >= 0; j--)
-        for (int k = 0; k < 3; k++) {
+        count += extra;
+        for (int j = cols - 1; j >= 0; j--)
+            for (int k = 0; k < 3; k++) {
                 switch (k) {
                 case 0:
-                    reds[i][j] = FileReadBuffer[end - count++];
+                    redsIm[i][j] = FileReadBuffer[end - count++];
+                    redsRe[i][j] = 0xFF;
                     break;
                 case 1:
-                    greens[i][j] = FileReadBuffer[end - count++];
+                    greensIm[i][j] = FileReadBuffer[end - count++];
+                    greensRe[i][j] = 0xFF;
                     break;
                 case 2:
-                    blues[i][j] = FileReadBuffer[end - count++];
+                    bluesIm[i][j] = FileReadBuffer[end - count++];
+                    bluesRe[i][j] = 0xFF;
                     break;
                 }
             }
-            }
+    }
 }
 
-void MainWindow::WriteOutBmp24(char* FileBuffer, const char* NameOfFileToCreate, int BufferSize) {
+void MainWindow::EscrituraDeImagen(char* FileBuffer, const char* NameOfFileToCreate, int BufferSize) {
     std::ofstream write(NameOfFileToCreate);
     if (!write) {
         cout << "Failed to write " << NameOfFileToCreate << endl;
@@ -273,39 +252,19 @@ void MainWindow::WriteOutBmp24(char* FileBuffer, const char* NameOfFileToCreate,
         for (int j = cols - 1; j >= 0; j--)
             for (int k = 0; k < 3; k++) {
                 switch (k) {
-                case 0: //reds
-                    FileBuffer[BufferSize - count] = reds[i][j];
+                case 0: //redsIm
+                    FileBuffer[BufferSize - count] = redsRe[i][j];
                     break;
                 case 1: //green
-                    FileBuffer[BufferSize - count] = greens[i][j];
+                    FileBuffer[BufferSize - count] = greensRe[i][j];
                     break;
                 case 2: //blue
-                    FileBuffer[BufferSize - count] = blues[i][j];
+                    FileBuffer[BufferSize - count] = bluesRe[i][j];
                     break;
                 }
                 count++;
             }
-            }
+    }
     write.write(FileBuffer, BufferSize);
 }
 
-
-void MainWindow::on_all_clicked()
-{
-    char* FileBuffer; int BufferSize;
-
-    #define Picture "Ness.bmp"
-    //if (!FillAndAllocate(FileBuffer, Picture, rows, cols, BufferSize)){}
-    if (!FillAndAllocate(FileBuffer, fileName.toUtf8().constData(), rows, cols, BufferSize)){}
-
-    RGB_Allocate(reds);
-    RGB_Allocate(greens);
-    RGB_Allocate(blues);
-    GetPixlesFromBMP24( reds,  greens, blues,BufferSize, rows, cols, FileBuffer);
-    #define WriteOutFile "newone.bmp"
-    WriteOutBmp24(FileBuffer,  WriteOutFile,BufferSize);
-
-
-
-
-}

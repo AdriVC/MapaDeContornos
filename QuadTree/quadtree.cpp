@@ -1,7 +1,10 @@
 #include "quadtree.h"
+#include <iostream>
 
-QuadTree::QuadTree(int left, int top, int length, int height, int profundidad){
-    this->root = new Nodo(left,top,length,height,0,0);
+using namespace std;
+
+QuadTree::QuadTree(int left, int top, int width, int height, int profundidad){
+    this->root = new Nodo(left,top,width,height,0,-1);
     this->profundidad = profundidad;
 }
 
@@ -29,6 +32,17 @@ Nodo* QuadTree::getRoot(){
     return root;
 }
 
-void QuadTree::insert(int left, int top, int length, int height, Nodo* parent, int pos){
-    parent->setSon(new Nodo(left,top,length,height,parent,pos),pos);
+int QuadTree::getDepth(){
+    int depth = 0;
+    int prueba = 0;
+    Nodo* temp = root;
+    for(int i = 0; i < 4; i++){
+        while(temp->getSon(i) != 0){
+            prueba++;
+            temp = temp->getSon(i);
+        }
+        if(prueba > depth)
+            depth = prueba;
+    }
+    return depth;
 }
