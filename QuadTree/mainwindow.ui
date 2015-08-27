@@ -229,31 +229,6 @@ background-color:rgb(255, 255, 255);</string>
      <string>PRoCESAR</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="b_exportarImagen">
-    <property name="geometry">
-     <rect>
-      <x>480</x>
-      <y>400</y>
-      <width>121</width>
-      <height>50</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>StarJedi Special Edition</family>
-      <pointsize>15</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">border-style: outset;
-border-width: 3px;
-border-color:rgb(0, 0, 0);
-background-color:rgb(255, 255, 255);</string>
-    </property>
-    <property name="text">
-     <string>Exportar</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
@@ -271,19 +246,6 @@ background-color:rgb(255, 255, 255);</string>
     </property>
     <property name="text">
      <string>Por: Adriana vega y Fernando Reyes</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="all">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>400</y>
-      <width>99</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
     </property>
    </widget>
   </widget>

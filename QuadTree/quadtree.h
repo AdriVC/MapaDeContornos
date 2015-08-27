@@ -8,14 +8,14 @@ class QuadTree{
     Nodo* root;
     int profundidad;
 public:
-    QuadTree(int left, int top, int length, int height, int profundidad);
+    QuadTree(int left, int top, int width, int height, int profundidad);
     ~QuadTree();
     Nodo* getParent(Nodo* nodo);
     Nodo* getSon(Nodo* nodo, int pos);
     int* getParams(Nodo* nodo);
     int getParam(Nodo* nodo, int pos);
     Nodo* getRoot();
-    void insert(int left, int top, int length, int height, Nodo* parent, int pos);
+    int getDepth();
 };
 
 #endif // QUADTREE_H

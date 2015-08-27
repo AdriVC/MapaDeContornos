@@ -40,9 +40,7 @@ public:
     QSpinBox *sB_profundidad;
     QLabel *L_profundidad;
     QPushButton *b_procesarImagen;
-    QPushButton *b_exportarImagen;
     QLabel *label;
-    QPushButton *all;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -125,14 +123,6 @@ public:
 "border-width: 3px;\n"
 "border-color:rgb(0, 0, 0);\n"
 "background-color:rgb(255, 255, 255);"));
-        b_exportarImagen = new QPushButton(centralWidget);
-        b_exportarImagen->setObjectName(QStringLiteral("b_exportarImagen"));
-        b_exportarImagen->setGeometry(QRect(480, 400, 121, 50));
-        b_exportarImagen->setFont(font1);
-        b_exportarImagen->setStyleSheet(QLatin1String("border-style: outset;\n"
-"border-width: 3px;\n"
-"border-color:rgb(0, 0, 0);\n"
-"background-color:rgb(255, 255, 255);"));
         label = new QLabel(centralWidget);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(440, 479, 271, 21));
@@ -140,9 +130,6 @@ public:
         font4.setFamily(QStringLiteral("StarJedi Special Edition"));
         font4.setPointSize(12);
         label->setFont(font4);
-        all = new QPushButton(centralWidget);
-        all->setObjectName(QStringLiteral("all"));
-        all->setGeometry(QRect(330, 400, 99, 27));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -170,9 +157,7 @@ public:
         L_titulo->setText(QApplication::translate("MainWindow", "MAPA DE CoNToRNoS", 0));
         L_profundidad->setText(QApplication::translate("MainWindow", "Profundidad:", 0));
         b_procesarImagen->setText(QApplication::translate("MainWindow", "PRoCESAR", 0));
-        b_exportarImagen->setText(QApplication::translate("MainWindow", "Exportar", 0));
         label->setText(QApplication::translate("MainWindow", "Por: Adriana vega y Fernando Reyes", 0));
-        all->setText(QApplication::translate("MainWindow", "PushButton", 0));
     } // retranslateUi
 
 };
